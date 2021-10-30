@@ -17,6 +17,9 @@ const NavMenu: React.FunctionComponent = () => {
               <LinkContainer to="/">
                 <Nav.Link className="text-dark">Home</Nav.Link>
               </LinkContainer>
+              <LinkContainer to="/mission-list">
+                <Nav.Link className="text-dark">Missions</Nav.Link>
+              </LinkContainer>
             </Nav>
           </Navbar.Collapse>
         </Container>

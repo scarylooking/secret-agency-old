@@ -20,6 +20,9 @@ const NavMenu: React.FunctionComponent = () => {
               <LinkContainer to="/mission-list">
                 <Nav.Link className="text-dark">Missions</Nav.Link>
               </LinkContainer>
+              <LinkContainer to="/mission-report">
+                <Nav.Link className="text-dark">Report</Nav.Link>
+              </LinkContainer>
             </Nav>
           </Navbar.Collapse>
         </Container>

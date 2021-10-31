@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Container, Row, Form, InputGroup, Button, Col } from 'react-bootstrap';
-import { Formik, validateYupSchema } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import * as yup from 'yup';
+import axios from 'axios'
 
-const schema = yup.object().shape({
+interface FormValues {
+  twitterHandle: string,
+  fieldNotes: string,
+  passcode: string,
+  timesCompleted: number,
+  missionId: string,
+  trustConfirmation: boolean,
+};
+
+const validationSchema = yup.object().shape({
   twitterHandle: yup.string()
     .required('Twitter handle is a required field')
     .min(4, 'Twitter handle must be at least 4 characters long')
@@ -25,31 +35,45 @@ const schema = yup.object().shape({
     .required('Mission is a required field')
 });
 
+const initialValues: FormValues = {
+  twitterHandle: '',
+  fieldNotes: '',
+  passcode: '',
+  timesCompleted: 1,
+  missionId: '',
+  trustConfirmation: false,
+};
+
 const MissionReport = () => {
+
+  const handleServerResponse = (successful: boolean, responseCode: number) => {
+    //TODO handle the response...
+  };
+
+  const sendReport = (values: FormValues, helpers: FormikHelpers<FormValues>) => {
+    console.log({ values, helpers });
+
+    axios.post("/api/mission-report", values)
+      .then(response => {
+        setTimeout(() => helpers.setSubmitting(false), 500);
+        helpers.resetForm();
+        handleServerResponse(true, response.status);
+      })
+      .catch(error => {
+        setTimeout(() => helpers.setSubmitting(false), 500);
+        handleServerResponse(false, error.response.status);
+      });
+  };
+
   return (
     <Container>
       <h1>Mission Report</h1>
       <Formik
-        validationSchema={schema}
-        onSubmit={console.log}
-        initialValues={{
-          twitterHandle: '',
-          fieldNotes: '',
-          passcode: '',
-          timesCompleted: 1,
-          missionId: 0,
-          trustConfirmation: false,
-        }}
+        validationSchema={validationSchema}
+        onSubmit={sendReport}
+        initialValues={initialValues}
       >
-        {({
-          handleSubmit,
-          handleChange,
-          handleBlur,
-          values,
-          touched,
-          isValid,
-          errors,
-        }) => (
+        {({ handleSubmit, handleChange, handleBlur, values, touched, isSubmitting, errors }) => (
           <Form noValidate onSubmit={handleSubmit}>
             <Row className="mb-3">
               <Form.Group as={Col} md="6" controlId="validationFormikTwitterHandle">
@@ -162,7 +186,7 @@ const MissionReport = () => {
               </Form.Group>
             </Row>
 
-            <Button type="submit">Send Report</Button>
+            <Button disabled={isSubmitting} type="submit">Send Report</Button>
           </Form>
         )}
       </Formik>
